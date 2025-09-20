@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lara finkelmeyer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #222;
+  color: white;
+  overflow-x: hidden;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+}
+
+@keyframes barrelRollOut {
+  0% { transform: rotateX(0deg) translateY(0); opacity: 1; }
+  100% { transform: rotateX(90deg) translateY(-100%); opacity: 0; }
+}
+.page-transition { animation: barrelRollOut 0.8s ease-in forwards; transform-origin: center top; }
+
+header { position: fixed; top: 0; left: 0; width: 100%; background: #222; padding: 20px; height: 80px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; transition: transform 0.3s ease; }
+header.hidden { transform: translateY(-100%); }
+header nav { display: flex; gap: 20px; }
+header nav a { position: relative; color: #bbb; text-decoration: none; font-weight: 600; font-size: 18px; overflow: hidden; transition: color 0.3s ease, transform 0.3s ease; }
+header nav a::after { content: attr(data-text); position: absolute; left: 0; top: 100%; width: 100%; color: white; transition: top 0.3s ease; }
+header nav a:hover::after { top: 0; }
+header nav a:hover { color: transparent; transform: scale(1.1); }
+header nav a.active { color: white; }
+header nav a.active::after { color: white; top: 0; }
+
+.header-name { position: absolute; left: 50%; transform: translateX(-50%); font-size: 24px; font-weight: 600; color: white; }
+
+.intro { height: 100vh; background: #222; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; transition: transform 0.3s ease, opacity 0.3s ease; }
+.intro h1 { font-size: 80px; font-weight: bold; }
+.intro p { margin-top: 20px; font-size: 24px; color: #bbb; }
+.arrow { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 20px solid white; margin-top: 60px; animation: bounce 1.5s infinite; }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+.video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; padding: 20px 20px 10px; transform: translateY(100px); opacity: 0; transition: transform 0.5s ease-out, opacity 0.5s ease-out; }
+.video-grid.vertical { grid-template-columns: repeat(4, 1fr); padding-top: 20px; padding-bottom: 10px; }
+
+.video-item { position: relative; background: #666; border-radius: 12px; overflow: hidden; cursor: pointer; }
+.video-item.horizontal { aspect-ratio: 16/9; }
+.video-item.vertical { aspect-ratio: 9/16; }
+
+.video-item img, .video-item video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; transition: transform 0.3s ease, opacity 0.5s ease; }
+.video-item img { z-index: 1; opacity: 1; }
+.video-item video { z-index: 2; opacity: 0; pointer-events: none; }
+.video-item:hover img { transform: scale(1.05); opacity: 0; }
+.video-item:hover video { transform: scale(1.05); opacity: 1; }
+
+.video-text { position: absolute; top: 20px; left: 20px; z-index: 3; font-size: 18px; opacity: 0; transform: translateY(20px); transition: transform 0.5s ease, opacity 0.5s ease; pointer-events: none; color: white; }
+.video-item:hover .video-text { opacity: 1; transform: translateY(0); }
+.titre { font-weight: 400; }
+.nom-video { font-weight: 600; }
+
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 900; }
+.overlay.active { opacity: 1; pointer-events: all; }
+
+.fullscreen-video {
+  position: fixed;
+  z-index: 1001;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  max-width: 90%; max-height: 80%;
+  background: black;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.4s ease, box-shadow 0.2s linear;
+  /* Ambilight flou initial */
+  box-shadow: 0 0 80px 40px rgba(255,255,255,0.1);
+}
+</style>
+</head>
+<body>
+
+<header id="page-header">
+<nav>
+<a href="index.html" data-text="work" class="active">work</a>
+<a href="about.html" data-text="about">about</a>
+</nav>
+<div class="header-name">lara finkelmeyer</div>
+</header>
+
+<div class="intro">
+<h1>Hi, I’m Lara!</h1>
+<p>I’m a video editor based in South Korea. Scroll down to see my work.</p>
+<div class="arrow"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- VIDEOS GRID HORIZONTALES -->
+<div class="video-grid" id="work">
+  <div class="video-item horizontal">
+    <img src="miniature/OD_JAPAN_BLUE_SHINKAI_SLUB_YT_16_9_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/OD_JAPAN_BLUE_SHINKAI_SLUB_YT_16_9.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">OKAYAMA DENIM –</span>
+      <span class="nom-video">OD x JAPAN BLUE DENIM COLLABORATION SET</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/SHINKAI_SLUB_FACTORY_YT_16_9_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/SHINKAI_SLUB_FACTORY_YT_16_9.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">OKAYAMA DENIM –</span>
+      <span class="nom-video">JAPAN'S BLUE DENIM FACTORY</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/TSUJIMURA_AI_YT_9_16_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/TSUJIMURA_AI_YT_9_16_.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">OKAYAMA DENIM –</span>
+      <span class="nom-video">TSUJIMURA DENIM FACTORY (JP)</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/boxteaser-1080p_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/boxteaser-1080p.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">XS BODY –</span>
+      <span class="nom-video">BOX TEASER (FR)</span>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEOS GRID VERTICALES -->
+<div class="video-grid vertical">
+  <div class="video-item vertical">
+    <img src="miniature/DJ_SUNSET_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/DJ_SUNSET.MOV" playsinline></video>
+    <div class="video-text">
+      <span class="titre">SHUN –</span>
+      <span class="nom-video">SUNSET DJ REEL</span>
+    </div>
+  </div>
+  <div class="video-item vertical">
+    <img src="miniature/SAMURAI_JACKET_REEL_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/SAMURAI_JACKET_REEL.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">OKAYAMA DENIM –</span>
+      <span class="nom-video">SAMURAI JACKET REEL</span>
+    </div>
+  </div>
+  <div class="video-item vertical">
+    <img src="miniature/STUDIO_DARTISAN_JACKET_REEL_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/STUDIO_DARTISAN_JACKET_REEL.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">OKAYAMA DENIM –</span>
+      <span class="nom-video">STUDIO D'ARTISAN JACKET REEL</span>
+    </div>
+  </div>
+  <div class="video-item vertical">
+    <img src="miniature/arte-usa-elections_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/arte-usa-elections.mp4" playsinline></video>
+    <div class="video-text">
+      <span class="titre">ARTE –</span>
+      <span class="nom-video">USA ELECTIONS REEL (FR)</span>
+    </div>
+  </div>
+</div>
+
+<!-- AUTRES VIDEOS HORIZONTALES -->
+<div class="video-grid">
+  <div class="video-item horizontal">
+    <img src="miniature/ARTE-beatlesssss - HD 1080p_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/ARTE-beatlesssss - HD 1080p.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">ARTE –</span>
+      <span class="nom-video">NEW BEATLES SONG REPORTAGE (FR)</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/VISA_UN_JOUR_PHOTO_PAULA_BRONSTEIN_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/VISA_UN_JOUR_PHOTO_PAULA_BRONSTEIN.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">FRANCE TELEVISIONS –</span>
+      <span class="nom-video">PAULA BRONSTEIN WAR PHOTOGRAPHY (FR)</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/Pablito_zago_france_3_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/Pablito_zago_france_3.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">FRANCE TELEVISIONS –</span>
+      <span class="nom-video">PABLITO ZAGO REPORTAGE (FR)</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/Utinam_horlogerie_FR3_besancon_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/Utinam_horlogerie_FR3_besancon.mp4" playsinline></video>
+    <div class="video-text">
+      <span class="titre">FRANCE TELEVISIONS –</span>
+      <span class="nom-video">HORLOGERIE UTIMA REPORTAGE (FR)</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/vendanges_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/vendanges_leger - HD 1080p.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">FRANCE TELEVISIONS –</span>
+      <span class="nom-video">VENDANGES (FR)</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/soeursdart_miniature.jpg" alt="">
+    <video muted preload="none" data-src="videos/SOEURS D'ART.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">FRANCE TELEVISIONS –</span>
+      <span class="nom-video">SOEUR D'ART (FR)</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/Voeux_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/voeux-leger - HD 1080p.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">FRANCE TELEVISIONS –</span>
+      <span class="nom-video">VOEUX DE BONNE ANNEE (FR)</span>
+    </div>
+  </div>
+  <div class="video-item horizontal">
+    <img src="miniature/Froid_miniature.jpeg" alt="">
+    <video muted preload="none" data-src="videos/froid_leger - HD 1080p.mov" playsinline></video>
+    <div class="video-text">
+      <span class="titre">FRANCE TELEVISIONS –</span>
+      <span class="nom-video">LE FROID (FR)</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let lastScrollY = window.scrollY;
+const header = document.getElementById('page-header');
+
+window.addEventListener('scroll', () => {
+  const currentScroll = window.scrollY;
+  if (currentScroll > lastScrollY && currentScroll > 100) {
+    header.classList.add('hidden');
+  } else {
+    header.classList.remove('hidden');
+  }
+  lastScrollY = currentScroll;
+});
+
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  document.querySelectorAll('.video-grid').forEach(grid => {
+    if (scrollY > 200) {
+      grid.style.transform = 'translateY(0)';
+      grid.style.opacity = '1';
+    } else {
+      grid.style.transform = 'translateY(100px)';
+      grid.style.opacity = '0';
+    }
+  });
+});
+
+const overlay = document.getElementById('overlay');
+let opened = null;
+let ambilightAnimation = null;
+
+function closeVideo() {
+  if (!opened) return;
+  opened.pause();
+  opened.remove();
+  overlay.classList.remove('active');
+  opened = null;
+  if (ambilightAnimation) cancelAnimationFrame(ambilightAnimation);
+}
+
+// Ambilight subtil lumineux
+function animateAmbilight(videoEl) {
+  let intensityMin = 0.1; // Luminosité minimale
+  let intensityMax = 0.25; // Luminosité maximale
+  let speed = 0.0008;     // Variation plus lente ou plus rapide
+  let intensity = intensityMin;
+  let direction = speed;
+
+  function step() {
+    intensity += direction;
+    if (intensity > intensityMax || intensity < intensityMin) direction *= -1;
+    videoEl.style.boxShadow = `0 0 80px 40px rgba(255,255,255,${intensity})`;
+    ambilightAnimation = requestAnimationFrame(step);
+  }
+  step();
+}
+
+// Hover preview + click fullscreen
+document.querySelectorAll('.video-item').forEach(item => {
+  const vid = item.querySelector('video');
+
+  // Hover preview
+  item.addEventListener('mouseenter', () => {
+    if (!vid.src) vid.src = vid.dataset.src;
+    vid.play();
+    vid.playbackRate = 0.8;
+  });
+  item.addEventListener('mouseleave', () => {
+    vid.pause();
+    vid.currentTime = 0;
+    vid.playbackRate = 1;
+  });
+
+  // Click fullscreen
+  item.addEventListener('click', () => {
+    if (opened) return;
+    const clone = vid.cloneNode(true);
+    clone.classList.add('fullscreen-video');
+    document.body.appendChild(clone);
+    overlay.classList.add('active');
+    clone.muted = false;
+    clone.play();
+    clone.playbackRate = 1;
+    opened = clone;
+    clone.addEventListener('click', closeVideo);
+    animateAmbilight(clone);
+  });
+});
+
+overlay.addEventListener('click', closeVideo);
+
+// Lazy load videos
+document.querySelectorAll('video[data-src]').forEach(v => {
+  const obs = new IntersectionObserver((entries, obsr) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        const video = en.target;
+        video.src = video.dataset.src;
+        video.removeAttribute('data-src');
+        obsr.unobserve(video);
+      }
+    });
+  }, { rootMargin: '0px 0px 200px 0px' });
+  obs.observe(v);
+});
+
+// Page transition links
+document.querySelectorAll('header nav a').forEach(link => {
+  link.addEventListener('click', function(e) {
+    const href = this.getAttribute('href');
+    if (!href || href.startsWith('#')) return;
+    e.preventDefault();
+    document.body.classList.add('page-transition');
+    setTimeout(() => { window.location.href = href; }, 800);
+  });
+});
+</script>
+
+</body>
+</html>
